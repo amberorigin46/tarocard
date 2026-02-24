@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>프리미엄 타로 마스터</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Noto+Serif+KR:wght@400;600;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0a0f;
+            --bg-card: #15151e;
+            --accent-gold: #d4a853;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --border-color: #2a2a35;
+            --shadow-glow: 0 0 15px rgba(212, 168, 83, 0.4);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: 'Noto Sans KR', sans-serif;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .control-panel {
+            width: 320px;
+            min-width: 320px;
+            background-color: var(--bg-dark);
+            border-right: 1px solid var(--border-color);
+            padding: 24px;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .panel-header {
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .panel-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.6rem;
+            color: var(--accent-gold);
+            margin-bottom: 5px;
+        }
+
+        .panel-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .section-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .panel-section {
+            margin-bottom: 30px;
+        }
+
+        textarea {
+            width: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: #fff;
+            padding: 12px;
+            font-size: 0.95rem;
+            resize: none;
+            transition: var(--transition);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 10px rgba(212, 168, 83, 0.1);
+        }
+
+        .option-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .bg-option {
+            aspect-ratio: 16/9;
+            border-radius: 6px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .bg-option img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.6;
+        }
+
+        .bg-option.active {
+            border-color: var(--accent-gold);
+        }
+
+        .bg-option.active img {
+            opacity: 1;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 8px;
+            border: none;
+            background: var(--accent-gold);
+            color: #000;
+            font-weight: 800;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .preview-area {
+            flex: 1;
+            background: #050508;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .reading-container {
+            position: relative;
+            width: 800px;
+            height: 450px;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 50px;
+            border-radius: 12px;
+            box-shadow: 0 30px 100px rgba(0, 0, 0, 1);
+            border: 1px solid rgba(212, 168, 83, 0.2);
+            overflow: hidden;
+        }
+
+        .reading-bg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.3;
+            filter: blur(4px);
+        }
+
+        .reading-overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle, transparent 40%, #000 100%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .reading-hook-layer {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            text-align: center;
+        }
+
+        .reading-hook-display {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: #fff;
+            line-height: 1.3;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.4), 0 0 30px #d4a853, 4px 4px 15px #000;
+            padding: 0 40px;
+        }
+
+        .card-spread {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 10;
+            perspective: 1200px;
+        }
+
+        .tarot-card {
+            width: 110px;
+            height: 185px;
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .tarot-card:hover {
+            transform: translateY(-20px) scale(1.05);
+            z-index: 100;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+
+        .tarot-card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .tarot-card.unselected {
+            opacity: 0.3;
+            filter: grayscale(0.8) blur(2px);
+            pointer-events: none;
+            transform: scale(0.9) !important;
+        }
+
+        .tarot-card.selected-focus {
+            transform: translateY(-50px) scale(1.3) !important;
+            z-index: 1000;
+            box-shadow: 0 0 40px rgba(212, 168, 83, 0.9);
+            filter: none !important;
+            opacity: 1 !important;
+        }
+
+        /* 결과 패널 아이템 스타일 */
+        .result-card-info {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid rgba(212, 168, 83, 0.4);
+        }
+
+        .result-card-name {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: var(--accent-gold);
+            text-shadow: 0 0 10px rgba(212, 168, 83, 0.3);
+        }
+
+        .result-card-direction {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .result-section {
+            margin-bottom: 20px;
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        .result-label {
+            font-size: 0.8rem;
+            color: var(--accent-gold);
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .result-meaning {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .result-advice {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #ddd;
+            word-break: keep-all;
+        }
+
+        .result-advice strong {
+            color: var(--accent-gold);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-front,
+        .card-back-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            border: 1.5px solid rgba(212, 168, 83, 0.5);
+            overflow: hidden;
+        }
+
+        .card-front {
+            transform: rotateY(180deg);
+        }
+
+        .card-back-face {
+            background: url('assets/card-back.png') no-repeat center center;
+            background-size: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-number-reveal {
+            font-family: 'Cinzel Decorative';
+            font-size: 4rem;
+            color: #fff;
+            text-shadow: 0 0 20px #d4a853, 0 0 50px #fff;
+            opacity: 0;
+            transform: scale(0.6);
+            transition: 0.8s;
+        }
+
+        .tarot-card.show-number .card-number-reveal {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
+        .card-front img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: none !important;
+        }
+
+        .countdown-timer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+            font-family: 'Cinzel Decorative';
+            font-size: 5rem;
+            color: #fff;
+            text-shadow: 0 0 30px #d4a853;
+        }
+
+        .reading-result-card-name {
+            position: absolute;
+            top: 48%;
+            /* 살짝 아래로 조정하여 질문 문구와 겹침 방지 */
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1001;
+            /* 카드보다 위에 표시 */
+            font-family: 'Noto Serif KR', serif;
+            font-size: 3.2rem;
+            font-weight: 900;
+            color: var(--accent-gold);
+            text-shadow: 0 0 20px rgba(0, 0, 0, 1), 0 0 40px rgba(212, 168, 83, 0.8), 2px 2px 4px #000;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            white-space: nowrap;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px 60px;
+            border-radius: 100px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(212, 168, 83, 0.2);
+        }
+
+        .reading-result-card-name.show {
+            opacity: 1;
+            top: 42%;
+        }
+
+        .reading-result-panel {
+            background: rgba(10, 10, 15, 0.98);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1.5px solid #d4a853;
+            margin-top: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 1);
+        }
+
+        .reading-title {
+            color: #d4a853;
+            text-align: center;
+            border-bottom: 2px solid rgba(212, 168, 83, 0.3);
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .reading-text {
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: #eee;
+        }
+
+        .mode-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-weight: 700;
+            transition: 0.3s;
+        }
+
+        .mode-btn.active {
+            background: var(--accent-gold);
+            color: #000;
+            box-shadow: var(--shadow-glow);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--accent-gold);
+            margin-top: 8px;
+        }
+
+        .slider-group {
+            margin-bottom: 20px;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 800px;
+            height: 450px;
+            background: #000;
+            overflow: hidden;
+            border-radius: 4px;
+        }
+
+        .canvas-bg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .gradient-vignette {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle, transparent 30%, rgba(0, 0, 0, 0.6) 100%);
+            z-index: 5;
+        }
+
+        .content-layer {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding-bottom: 60px;
+            z-index: 10;
+            text-align: center;
+        }
+
+        .hook-display {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 1);
+            line-height: 1.3;
+        }
+
+        .particles-container {
+            position: absolute;
+            inset: 0;
+            z-index: 8;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            opacity: 0.4;
+            animation: float 8s infinite ease-in-out;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-20px) translateX(10px);
+            }
+        }
+
+        .deco-corner {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border: 2px solid rgba(212, 168, 83, 0.5);
+            z-index: 15;
+            pointer-events: none;
+        }
+
+        .deco-tl {
+            top: 20px;
+            left: 20px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .deco-tr {
+            top: 20px;
+            right: 20px;
+            border-left: none;
+            border-bottom: none;
+        }
+
+        .deco-bl {
+            bottom: 20px;
+            left: 20px;
+            border-right: none;
+            border-top: none;
+        }
+
+        .deco-br {
+            bottom: 20px;
+            right: 20px;
+            border-left: none;
+            border-top: none;
+        }
+    </style>
+</head>
+
+<body>
+    <aside class="control-panel">
+        <div class="panel-header">
+            <h1 class="panel-title">Tarot Master</h1><span class="panel-subtitle">Premium Reading & Thumbnail</span>
+        </div>
+        <div class="mode-buttons"><button id="mode-gen" class="mode-btn active"
+                onclick="setMode('generator')">생성기</button><button id="mode-read" class="mode-btn"
+                onclick="setMode('reading')">타로 리딩</button></div>
+        <div id="generator-controls">
+            <div class="panel-section"><label class="section-label">질문 문구 (Hook)</label><textarea id="hook-text"
+                    rows="3" placeholder="여기에 입력하세요..."
+                    oninput="updatePreview()">헤어진 그 사람,&#13;&#10;나를 생각하고 있을까?</textarea></div>
+            <div class="panel-section">
+                <label class="section-label">세부 조정</label>
+                <div class="slider-group">
+                    <div class="slider-label"><span>글자 크기</span><span id="label-font">100%</span></div><input
+                        type="range" id="font-size-slider" min="50" max="200" value="100" oninput="updatePreview()">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>위치 조절</span><span id="label-pos">0</span></div><input type="range"
+                        id="position-slider" min="-100" max="100" value="0" oninput="updatePreview()">
+                </div>
+                <label class="toggle-group"><input type="checkbox" id="toggle-vignette" checked
+                        onchange="updatePreview()"> 비네팅 효과</label><label class="toggle-group"><input type="checkbox"
+                        id="toggle-particles" checked onchange="updatePreview()"> 신비로운 입자</label>
+            </div>
+            <div class="panel-section"><label class="section-label">배경 선택</label>
+                <div id="bg-options" class="option-grid">
+                    <div class="bg-option active" data-bg="bg1" onclick="setBg('bg1')"><img
+                            src="assets/bg-original.png"></div>
+                    <div class="bg-option" data-bg="bg2" onclick="setBg('bg2')"><img src="assets/bg-thumbnail.png">
+                    </div>
+                    <div class="bg-option" data-bg="bg3" onclick="setBg('bg3')"><img src="assets/bg-reels.png"></div>
+                    <div class="bg-option" data-bg="bg4" onclick="setBg('bg4')"><img src="assets/bg-dungeon.png"></div>
+                </div><button class="action-btn"
+                    style="margin-top:15px; background:#222; color:#fff; border:1px solid #444;"
+                    onclick="triggerCustomBg()">📁 배경 직접 선택</button><input type="file" id="custom-bg-input"
+                    style="display:none" accept="image/*" onchange="handleCustomBg(event)">
+            </div>
+            <button class="action-btn" onclick="downloadImage()">💾 썸네일 이미지 저장</button>
+        </div>
+        <div id="reading-controls" style="display:none">
+            <div class="panel-section"><label class="section-label">셔플 도구</label>
+                <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:20px; line-height:1.6;">가장 마음이
+                    가는 카드 1장을 뽑으세요.<br>5초의 셔플 후 운명의 숫자가 나타납니다.</p><button id="btn-start-reading" class="action-btn"
+                    onclick="startReadingFlow()">🔮 셔플 시작하기</button>
+            </div>
+            <div id="reading-result-panel" class="reading-result-panel" style="display:none">
+                <h3 class="reading-title">운명의 조언</h3>
+                <div id="reading-text" class="reading-text"></div><button class="action-btn"
+                    style="margin-top:20px; background:transparent; border:1px solid #d4a853; color:#d4a853;"
+                    onclick="resetReading()">다시 리딩하기</button>
+            </div>
+        </div>
+    </aside>
+    <main class="preview-area">
+        <div id="canvas-container" class="canvas-container"><img id="bg-image" class="canvas-bg"
+                src="assets/bg-original.png">
+            <div id="vignette-overlay" class="gradient-vignette"></div>
+            <div id="particles-container" class="particles-container"></div>
+            <div class="content-layer">
+                <div id="hook-display" class="hook-display"></div>
+            </div>
+            <div class="deco-corner deco-tl"></div>
+            <div class="deco-corner deco-tr"></div>
+            <div class="deco-corner deco-bl"></div>
+            <div class="deco-corner deco-br"></div>
+        </div>
+        <div id="reading-container" class="reading-container" style="display:none"><img class="reading-bg"
+                src="assets/bg-dungeon.png">
+            <div class="reading-overlay"></div>
+            <div class="reading-hook-layer">
+                <div id="reading-hook-display" class="reading-hook-display"></div>
+            </div>
+            <div id="reading-result-card-name" class="reading-result-card-name"></div>
+            <div id="countdown-timer" class="countdown-timer" style="display:none">5</div>
+            <div id="card-spread" class="card-spread"></div>
+            <div class="deco-corner deco-tl"></div>
+            <div class="deco-corner deco-tr"></div>
+            <div class="deco-corner deco-bl"></div>
+            <div class="deco-corner deco-br"></div>
+        </div>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="assets-data.js?v=4"></script>
+    <script src="tarot-db.js?v=4"></script>
+    <script src="app.js?v=4"></script>
+</body>
+
+</html>
