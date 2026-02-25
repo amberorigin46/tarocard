@@ -164,17 +164,17 @@
 
         .reading-container {
             position: relative;
-            width: 800px;
-            height: 450px;
+            width: 100%;
+            height: 100%;
             background: #000;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            padding-top: 50px;
-            border-radius: 12px;
-            box-shadow: 0 30px 100px rgba(0, 0, 0, 1);
-            border: 1px solid rgba(212, 168, 83, 0.2);
+            padding-top: 30px;
+            border-radius: 0;
+            box-shadow: none;
+            border: none;
             overflow: hidden;
         }
 
@@ -184,14 +184,14 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            opacity: 0.3;
-            filter: blur(4px);
+            opacity: 0.25;
+            filter: blur(6px);
         }
 
         .reading-overlay {
             position: absolute;
             inset: 0;
-            background: radial-gradient(circle, transparent 40%, #000 100%);
+            background: radial-gradient(ellipse at 50% 100%, transparent 30%, #000 85%);
             z-index: 1;
             pointer-events: none;
         }
@@ -205,7 +205,7 @@
 
         .reading-hook-display {
             font-family: 'Noto Serif KR', serif;
-            font-size: 2.8rem;
+            font-size: 2rem;
             font-weight: 900;
             color: #fff;
             line-height: 1.3;
@@ -213,54 +213,131 @@
             padding: 0 40px;
         }
 
+        /* === 선택 슬롯 (원인/현재상황/방향) === */
+        .selected-slots {
+            position: relative;
+            z-index: 20;
+            display: flex;
+            gap: 30px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+
+        .slot {
+            width: 90px;
+            height: 140px;
+            border: 2px dashed rgba(212, 168, 83, 0.4);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            transition: all 0.5s ease;
+        }
+
+        .slot.filled {
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 20px rgba(212, 168, 83, 0.5);
+            background: rgba(212, 168, 83, 0.08);
+        }
+
+        .slot-label {
+            position: absolute;
+            bottom: -22px;
+            font-size: 0.7rem;
+            color: var(--accent-gold);
+            font-weight: 700;
+            letter-spacing: 2px;
+            white-space: nowrap;
+        }
+
+        .slot-number {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.8rem;
+            color: rgba(212, 168, 83, 0.3);
+        }
+
+        .slot img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        /* === 부채꼴 카드 스프레드 === */
         .card-spread {
             position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 15px;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             z-index: 10;
-            perspective: 1200px;
+            pointer-events: none;
         }
 
         .tarot-card {
-            width: 110px;
-            height: 185px;
+            position: absolute;
+            width: 117px;
+            height: 186px;
             cursor: pointer;
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: auto;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .tarot-card:hover {
-            transform: translateY(-20px) scale(1.05);
-            z-index: 100;
+            filter: brightness(1.4) drop-shadow(0 0 10px rgba(212, 168, 83, 0.8));
+            z-index: 100 !important;
+        }
+
+        .tarot-card:hover .card-inner {
+            box-shadow: 0 0 25px rgba(212, 168, 83, 0.7);
         }
 
         .card-inner {
             position: relative;
             width: 100%;
             height: 100%;
-            transition: transform 0.8s;
+            transition: transform 0.8s, box-shadow 0.3s;
             transform-style: preserve-3d;
+            border-radius: 8px;
         }
 
         .tarot-card.flipped .card-inner {
             transform: rotateY(180deg);
         }
 
-        .tarot-card.unselected {
-            opacity: 0.3;
-            filter: grayscale(0.8) blur(2px);
+        .tarot-card.picked {
             pointer-events: none;
-            transform: scale(0.9) !important;
+            opacity: 0;
+            transition: all 0.6s ease-in-out;
+        }
+
+        .tarot-card.unselected {
+            opacity: 0.15;
+            filter: grayscale(1) blur(1px);
+            pointer-events: none;
         }
 
         .tarot-card.selected-focus {
-            transform: translateY(-50px) scale(1.3) !important;
             z-index: 1000;
-            box-shadow: 0 0 40px rgba(212, 168, 83, 0.9);
             filter: none !important;
             opacity: 1 !important;
+        }
+
+        /* === 선택 카운터 표시 === */
+        .pick-counter {
+            position: absolute;
+            bottom: 310px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 15;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 0.85rem;
+            color: rgba(212, 168, 83, 0.8);
+            letter-spacing: 1px;
         }
 
         /* 결과 패널 아이템 스타일 */
@@ -426,6 +503,76 @@
             border: 1.5px solid #d4a853;
             margin-top: 20px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 1);
+        }
+
+        /* 전문 리딩 스타일 추가 */
+        .professional-reading {
+            animation: fadeIn 1s ease-out;
+        }
+
+        .reading-intro {
+            font-size: 1.1rem;
+            color: var(--accent-gold);
+            margin-bottom: 25px;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .reading-entry {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 3px solid var(--accent-gold);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .entry-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .entry-pos {
+            font-weight: 900;
+            color: var(--accent-gold);
+            font-size: 0.9rem;
+        }
+
+        .entry-card {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .entry-content {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: #ccc;
+        }
+
+        .reading-summary {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(212, 168, 83, 0.1);
+            border: 1px dashed var(--accent-gold);
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .summary-label {
+            font-weight: 900;
+            color: var(--accent-gold);
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        .summary-text {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #fff;
+            word-break: keep-all;
         }
 
         .reading-title {
@@ -604,6 +751,100 @@
             border-left: none;
             border-top: none;
         }
+
+        /* === 운세 카테고리 선택 === */
+        .category-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .category-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 8px;
+            background: rgba(30, 25, 40, 0.8);
+            border: 1px solid rgba(212, 168, 83, 0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-secondary);
+        }
+
+        .category-btn:hover {
+            border-color: rgba(212, 168, 83, 0.7);
+            background: rgba(212, 168, 83, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .category-btn.active {
+            border-color: #d4a853;
+            background: rgba(212, 168, 83, 0.15);
+            color: #d4a853;
+            box-shadow: 0 0 12px rgba(212, 168, 83, 0.3);
+        }
+
+        .cat-icon {
+            font-size: 1.4rem;
+            margin-bottom: 4px;
+        }
+
+        .cat-name {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* === 공유/업로드 버튼 === */
+        .share-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(212, 168, 83, 0.2);
+        }
+
+        .share-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .share-btn {
+            padding: 10px 8px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.78rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: #fff;
+        }
+
+        .share-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.2);
+        }
+
+        .share-download {
+            background: linear-gradient(135deg, #2d2d2d, #444);
+            grid-column: 1 / -1;
+        }
+
+        .share-tiktok {
+            background: linear-gradient(135deg, #010101, #333);
+            border: 1px solid #69C9D0;
+        }
+
+        .share-reels {
+            background: linear-gradient(135deg, #833AB4, #E1306C);
+        }
+
+        .share-shorts {
+            background: linear-gradient(135deg, #FF0000, #CC0000);
+            grid-column: 1 / -1;
+        }
     </style>
 </head>
 
@@ -649,15 +890,51 @@
             <button class="action-btn" onclick="downloadImage()">💾 썸네일 이미지 저장</button>
         </div>
         <div id="reading-controls" style="display:none">
+            <!-- 운세 카테고리 선택 -->
+            <div class="panel-section" id="category-section">
+                <label class="section-label">운세 선택</label>
+                <div class="category-grid">
+                    <button class="category-btn active" data-cat="love" onclick="selectCategory('love')">
+                        <span class="cat-icon">💕</span><span class="cat-name">애정운</span>
+                    </button>
+                    <button class="category-btn" data-cat="money" onclick="selectCategory('money')">
+                        <span class="cat-icon">💰</span><span class="cat-name">금전운</span>
+                    </button>
+                    <button class="category-btn" data-cat="reunion" onclick="selectCategory('reunion')">
+                        <span class="cat-icon">🔄</span><span class="cat-name">재회운</span>
+                    </button>
+                    <button class="category-btn" data-cat="career" onclick="selectCategory('career')">
+                        <span class="cat-icon">💼</span><span class="cat-name">직업운</span>
+                    </button>
+                    <button class="category-btn" data-cat="health" onclick="selectCategory('health')">
+                        <span class="cat-icon">🌿</span><span class="cat-name">건강운</span>
+                    </button>
+                    <button class="category-btn" data-cat="general" onclick="selectCategory('general')">
+                        <span class="cat-icon">✨</span><span class="cat-name">종합운</span>
+                    </button>
+                </div>
+            </div>
             <div class="panel-section"><label class="section-label">셔플 도구</label>
-                <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:20px; line-height:1.6;">가장 마음이
-                    가는 카드 1장을 뽑으세요.<br>5초의 셔플 후 운명의 숫자가 나타납니다.</p><button id="btn-start-reading" class="action-btn"
+                <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:20px; line-height:1.6;">마음을
+                    가다듬고,
+                    끌리는 카드 3장을 뽑으세요.<br>(원인 → 현재상황 → 앞으로의 방향 순서입니다)</p><button id="btn-start-reading" class="action-btn"
                     onclick="startReadingFlow()">🔮 셔플 시작하기</button>
             </div>
             <div id="reading-result-panel" class="reading-result-panel" style="display:none">
                 <h3 class="reading-title">운명의 조언</h3>
-                <div id="reading-text" class="reading-text"></div><button class="action-btn"
-                    style="margin-top:20px; background:transparent; border:1px solid #d4a853; color:#d4a853;"
+                <div id="reading-text" class="reading-text"></div>
+                <!-- 공유/업로드 버튼 -->
+                <div class="share-section">
+                    <label class="section-label" style="margin-top:20px;">📱 결과 공유 & 업로드</label>
+                    <div class="share-buttons">
+                        <button class="share-btn share-download" onclick="downloadReadingImage()">💾 이미지 저장</button>
+                        <button class="share-btn share-tiktok" onclick="shareToSocial('tiktok')">🎵 TikTok</button>
+                        <button class="share-btn share-reels" onclick="shareToSocial('reels')">📷 Reels</button>
+                        <button class="share-btn share-shorts" onclick="shareToSocial('shorts')">▶️ Shorts</button>
+                    </div>
+                </div>
+                <button class="action-btn"
+                    style="margin-top:15px; background:transparent; border:1px solid #d4a853; color:#d4a853;"
                     onclick="resetReading()">다시 리딩하기</button>
             </div>
         </div>
@@ -681,7 +958,14 @@
             <div class="reading-hook-layer">
                 <div id="reading-hook-display" class="reading-hook-display"></div>
             </div>
+            <div id="selected-slots" class="selected-slots">
+                <div class="slot" id="slot-0"><span class="slot-number">1</span><span class="slot-label">원인</span></div>
+                <div class="slot" id="slot-1"><span class="slot-number">2</span><span class="slot-label">현재상황</span>
+                </div>
+                <div class="slot" id="slot-2"><span class="slot-number">3</span><span class="slot-label">방향</span></div>
+            </div>
             <div id="reading-result-card-name" class="reading-result-card-name"></div>
+            <div id="pick-counter" class="pick-counter" style="display:none">카드를 선택하세요 (0/3)</div>
             <div id="countdown-timer" class="countdown-timer" style="display:none">5</div>
             <div id="card-spread" class="card-spread"></div>
             <div class="deco-corner deco-tl"></div>
@@ -692,8 +976,8 @@
     </main>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="assets-data.js?v=4"></script>
-    <script src="tarot-db.js?v=4"></script>
-    <script src="app.js?v=4"></script>
+    <script src="tarot-db.js?v=10"></script>
+    <script src="app.js?v=10"></script>
 </body>
 
 </html>
